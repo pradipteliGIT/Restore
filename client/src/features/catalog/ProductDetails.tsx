@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Product } from '../../app/models/Product';
 import {
   Button,
-  CircularProgress,
   Divider,
   Grid,
   Table,
@@ -13,8 +12,10 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import axios from 'axios';
 import { ArrowBackIos } from '@mui/icons-material';
+import agent from '../../app/api/agent';
+import NotFound from '../../app/errors/NotFound';
+import LoadingComponent from '../../app/layout/LoadingComponent';
 
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
@@ -24,17 +25,14 @@ export default function ProductDetails() {
 
   useEffect(() => {
     setLoading(true);
-    axios
-      .get(`http://localhost:5000/api/Products/${id}`)
-      .then((res) => {
-        console.log(res.data);
-        setProduct(res.data);
-      })
-      .catch((error) => console.log(error))
-      .finally(() => setLoading(false));
+    id &&
+      agent.Catalog.details(parseInt(id))
+        .then((product) => setProduct(product))
+        .catch((error) => console.log(error))
+        .finally(() => setLoading(false));
   }, [id]);
-  if (loading) return <CircularProgress />;
-  if (!product) return null;
+  if (loading) return <LoadingComponent message='Loading product details' />;
+  if (!product) return <NotFound />;
   const { name, description, pictureUrl, price, type, brand, quantityInStock } =
     product;
   return (
@@ -91,9 +89,11 @@ export default function ProductDetails() {
             </TableBody>
           </Table>
         </TableContainer>
+        <Divider />
         <Button
           variant='outlined'
           color='primary'
+          sx={{ marginTop: 1 }}
           startIcon={<ArrowBackIos />}
           onClick={() => {
             navigate(-1);
