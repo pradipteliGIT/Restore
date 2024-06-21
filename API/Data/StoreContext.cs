@@ -8,5 +8,7 @@ namespace API.Data
        public StoreContext(DbContextOptions dbContextOptions) :base(dbContextOptions) { }
 
         public DbSet<Product> Products { get; set; }
+
+        public DbSet<Basket> Baskets { get; set; }
     }
 }

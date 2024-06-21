@@ -10,8 +10,9 @@ import {
   Typography,
 } from '@mui/material';
 import { MaterialUISwitch } from './MaterialUISwitch';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { ShoppingCart } from '@mui/icons-material';
+import { useStoreContext } from '../context/StoreContext';
 const middleLinks = [
   {
     title: 'catalog',
@@ -50,6 +51,11 @@ const navStyles = {
   '&.active': { color: 'text.secondary' },
 };
 export default function Header({ darkMode, setDarkMode }: Props) {
+  const { basket } = useStoreContext();
+  const totalCount = basket?.items.reduce(
+    (acc, curVal) => acc + curVal.quantity,
+    0
+  );
   return (
     <AppBar
       position='sticky'
@@ -94,9 +100,11 @@ export default function Header({ darkMode, setDarkMode }: Props) {
             size='large'
             color='inherit'
             sx={{ mx: 1 }}
+            component={Link}
+            to='/basket'
           >
             <Badge
-              badgeContent='6'
+              badgeContent={totalCount}
               color='secondary'
             >
               <ShoppingCart color='inherit'></ShoppingCart>

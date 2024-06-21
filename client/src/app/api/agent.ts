@@ -3,10 +3,11 @@ import { toast } from 'react-toastify';
 import { router } from '../router/Router';
 
 //crated timeout for each request
-const sleep = () => new Promise((resolve) => setTimeout(resolve, 5000));
+const sleep = () => new Promise((resolve) => setTimeout(resolve, 1000));
 
 //set URL
 axios.defaults.baseURL = 'http://localhost:5000/api/';
+axios.defaults.withCredentials = true;
 
 //adding headers
 const apiClient = axios.create({
@@ -57,10 +58,10 @@ const responseBody = (response: AxiosResponse) => response.data;
 const request = {
   get: (url: string) => apiClient.get(url).then(responseBody),
   put: (url: string, body: object) =>
-    apiClient.get(url, body).then(responseBody),
+    apiClient.put(url, body).then(responseBody),
   post: (url: string, body: object) =>
-    apiClient.get(url, body).then(responseBody),
-  delete: (url: string) => apiClient.get(url).then(responseBody),
+    apiClient.post(url, body).then(responseBody),
+  delete: (url: string) => apiClient.delete(url).then(responseBody),
 };
 
 //For product
@@ -78,8 +79,18 @@ const TestErrors = {
   get500Error: () => request.get('buggy/server-error'),
 };
 
+//For basket
+const Basket = {
+  getBasket: () => request.get('basket'),
+  addItem: (productId: number, quantity = 1) =>
+    request.post(`basket?productId=${productId}&quantity=${quantity}`, {}),
+  removeItem: (productId: number, quantity = 1) =>
+    request.delete(`basket?productId=${productId}&quantity=${quantity}`),
+};
+
 const agent = {
   Catalog,
   TestErrors,
+  Basket,
 };
 export default agent;

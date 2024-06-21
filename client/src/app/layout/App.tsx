@@ -5,13 +5,34 @@ import {
   createTheme,
 } from '@mui/material';
 import Header from './Header';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getCookie } from '../utils/utils';
+import agent from '../api/agent';
+import { useStoreContext } from '../context/StoreContext';
+import LoadingComponent from './LoadingComponent';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { setBasket } = useStoreContext();
+  //Getting basket data
+  useEffect(() => {
+    const buyerId = getCookie('buyerId');
+    if (buyerId) {
+      agent.Basket.getBasket()
+        .then((data) => setBasket(data))
+        .catch((error) => console.log(error))
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      setIsLoading(false);
+    }
+  }, [setBasket]);
+
   const paletteType = darkMode ? 'dark' : 'light';
   //Creating theme
   const theme = createTheme({
@@ -28,6 +49,8 @@ function App() {
   const OnSetDarkMode = () => {
     setDarkMode((prevState) => !prevState);
   };
+
+  if (isLoading) return <LoadingComponent message='Initializing application' />;
 
   return (
     <ThemeProvider theme={theme}>
