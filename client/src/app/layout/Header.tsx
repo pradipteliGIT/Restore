@@ -12,7 +12,7 @@ import {
 import { MaterialUISwitch } from './MaterialUISwitch';
 import { Link, NavLink } from 'react-router-dom';
 import { ShoppingCart } from '@mui/icons-material';
-import { useStoreContext } from '../context/StoreContext';
+import { useAppSelector } from '../store/configureStore';
 const middleLinks = [
   {
     title: 'catalog',
@@ -51,7 +51,7 @@ const navStyles = {
   '&.active': { color: 'text.secondary' },
 };
 export default function Header({ darkMode, setDarkMode }: Props) {
-  const { basket } = useStoreContext();
+  const { basket } = useAppSelector((state) => state.basket);
   const totalCount = basket?.items.reduce(
     (acc, curVal) => acc + curVal.quantity,
     0
@@ -125,6 +125,7 @@ export default function Header({ darkMode, setDarkMode }: Props) {
           <FormControlLabel
             control={
               <MaterialUISwitch
+                id='dmSwitch'
                 sx={{ m: 1 }}
                 checked={darkMode}
                 onChange={setDarkMode}

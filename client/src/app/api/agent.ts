@@ -66,7 +66,7 @@ const request = {
 
 //For product
 const Catalog = {
-  list: () => request.get('products'),
+  list: () => request.get('buggy/server-error'),
   details: (id: number) => request.get(`products/${id}`),
 };
 

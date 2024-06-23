@@ -13,36 +13,26 @@ import {
   Typography,
 } from '@mui/material';
 import { Add, Delete, Remove } from '@mui/icons-material';
-import { useStoreContext } from '../../app/context/StoreContext';
-import agent from '../../app/api/agent';
-import { useState } from 'react';
 import { LoadingButton } from '@mui/lab';
 import { Link } from 'react-router-dom';
 import BasketSummary from './BasketSummary';
 
 import { currencyFormat } from '../../app/utils/utils';
+import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
+import { addBasketItemAsync, removeBasketItemAsync } from './basketSlice';
 
 export default function BasketPage() {
-  const [status, setStatus] = useState({ loading: false, name: '' });
-  const { basket, removeItem, setBasket } = useStoreContext();
-
-  const handleAddItem = (productId: number, quantity = 1, name: string) => {
-    setStatus({ loading: true, name });
-    agent.Basket.addItem(productId, quantity)
-      .then((basket) => setBasket(basket))
-      .catch((error) => console.log(error))
-      .finally(() => setStatus({ loading: false, name: '' }));
+  const { basket, status } = useAppSelector((state) => state.basket);
+  const dispatch = useAppDispatch();
+  const handleAddItem = (productId: number, quantity = 1) => {
+    dispatch(addBasketItemAsync({ productId, quantity }));
   };
 
-  const handleRemoveItem = (productId: number, quantity = 1, name: string) => {
-    setStatus({ loading: true, name });
-    agent.Basket.removeItem(productId, quantity)
-      .then(() => removeItem(productId, quantity))
-      .catch((error) => console.log(error))
-      .finally(() => setStatus({ loading: false, name: '' }));
+  const handleRemoveItem = (productId: number, quantity = 1, name?: string) => {
+    dispatch(removeBasketItemAsync({ productId, quantity, name }));
   };
 
-  if (!basket)
+  if (!basket || basket.items.length === 0)
     return <Typography variant='h3'>Your basket is empty</Typography>;
 
   return (
@@ -81,28 +71,18 @@ export default function BasketPage() {
                   >
                     <LoadingButton
                       loading={
-                        status.loading && status.name === 'rem' + item.productId
+                        status === 'pendingRemoveItem' + item.productId + 'rem'
                       }
                       color='error'
-                      onClick={() =>
-                        handleRemoveItem(
-                          item.productId,
-                          1,
-                          'rem' + item.productId
-                        )
-                      }
+                      onClick={() => handleRemoveItem(item.productId, 1, 'rem')}
                     >
                       <Remove />
                     </LoadingButton>
                     {item.quantity}
                     <LoadingButton
-                      loading={
-                        status.loading && status.name === 'add' + item.productId
-                      }
+                      loading={status === 'pendingAddItem' + item.productId}
                       color='error'
-                      onClick={() =>
-                        handleAddItem(item.productId, 1, 'add' + item.productId)
-                      }
+                      onClick={() => handleAddItem(item.productId, 1)}
                     >
                       <Add />
                     </LoadingButton>
@@ -114,15 +94,11 @@ export default function BasketPage() {
                 <TableCell>
                   <LoadingButton
                     loading={
-                      status.loading && status.name === 'del' + item.productId
+                      status === 'pendingRemoveItem' + item.productId + 'del'
                     }
                     color='error'
                     onClick={() =>
-                      handleRemoveItem(
-                        item.productId,
-                        item.quantity,
-                        'del' + item.productId
-                      )
+                      handleRemoveItem(item.productId, item.quantity, 'del')
                     }
                   >
                     <Delete />

@@ -7,10 +7,10 @@ import {
   Typography,
 } from '@mui/material';
 import { currencyFormat } from '../../app/utils/utils';
-import { useStoreContext } from '../../app/context/StoreContext';
+import { useAppSelector } from '../../app/store/configureStore';
 
 export default function BasketSummary() {
-  const { basket } = useStoreContext();
+  const { basket } = useAppSelector((state) => state.basket);
   const standardDeliveryFee = 500;
   const subtotal =
     basket?.items.reduce((sum, item) => sum + item.price * item.quantity, 0) ??
