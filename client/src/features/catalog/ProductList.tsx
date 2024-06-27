@@ -1,12 +1,14 @@
-import { Button, Grid } from '@mui/material';
 import ProductCard from './ProductCard';
 import { Product } from '../../app/models/Product';
+import { Grid } from '@mui/material';
+import { useAppSelector } from '../../app/store/configureStore';
+import ProductCardSkeleton from './ProductCardSkeleton';
 
 type Props = {
   products: Product[];
-  addProduct: () => void;
 };
-export default function ProductList({ products, addProduct }: Props) {
+export default function ProductList({ products }: Props) {
+  const { productsLoadedState } = useAppSelector((state) => state.catalog);
   return (
     <>
       <Grid
@@ -18,19 +20,17 @@ export default function ProductList({ products, addProduct }: Props) {
             item
             xs={10}
             sm={6}
-            md={3}
+            md={4}
             key={product.id}
           >
-            <ProductCard product={product} />
+            {!productsLoadedState ? (
+              <ProductCardSkeleton />
+            ) : (
+              <ProductCard product={product} />
+            )}
           </Grid>
         ))}
       </Grid>
-      <Button
-        variant='outlined'
-        onClick={addProduct}
-      >
-        Add Product
-      </Button>
     </>
   );
 }
