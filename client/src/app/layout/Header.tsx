@@ -13,6 +13,7 @@ import { MaterialUISwitch } from './MaterialUISwitch';
 import { Link, NavLink } from 'react-router-dom';
 import { ShoppingCart } from '@mui/icons-material';
 import { useAppSelector } from '../store/configureStore';
+import SignInMenu from './SignInMenu';
 const middleLinks = [
   {
     title: 'catalog',
@@ -52,6 +53,7 @@ const navStyles = {
 };
 export default function Header({ darkMode, setDarkMode }: Props) {
   const { basket } = useAppSelector((state) => state.basket);
+  const { user } = useAppSelector((state) => state.account);
   const totalCount = basket?.items.reduce(
     (acc, curVal) => acc + curVal.quantity,
     0
@@ -110,18 +112,23 @@ export default function Header({ darkMode, setDarkMode }: Props) {
               <ShoppingCart color='inherit'></ShoppingCart>
             </Badge>
           </IconButton>
-          <List sx={{ display: 'flex' }}>
-            {sideLinks.map(({ title, path }) => (
-              <ListItem
-                key={title}
-                component={NavLink}
-                to={path}
-                sx={{ ...navStyles }}
-              >
-                {title.toUpperCase()}
-              </ListItem>
-            ))}
-          </List>
+          {user ? (
+            <SignInMenu />
+          ) : (
+            <List sx={{ display: 'flex' }}>
+              {sideLinks.map(({ title, path }) => (
+                <ListItem
+                  key={title}
+                  component={NavLink}
+                  to={path}
+                  sx={{ ...navStyles }}
+                >
+                  {title.toUpperCase()}
+                </ListItem>
+              ))}
+            </List>
+          )}
+
           <FormControlLabel
             control={
               <MaterialUISwitch

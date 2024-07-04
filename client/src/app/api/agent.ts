@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { router } from '../router/Router';
 import { Pagination } from '../models/pagination';
+import { store } from '../store/configureStore';
 
 //crated timeout for each request
 const sleep = () => new Promise((resolve) => setTimeout(resolve, 1000));
@@ -11,15 +12,13 @@ axios.defaults.baseURL = 'http://localhost:5000/api/';
 axios.defaults.withCredentials = true;
 
 //adding headers
-const apiClient = axios.create({
-  headers: {
-    'Content-Type': 'application/json',
-    //------We can add other headers here like token
-  },
+axios.interceptors.request.use((config) => {
+  const token = store.getState().account.user?.token;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
 });
-
 //added interceptor to catch error
-apiClient.interceptors.response.use(
+axios.interceptors.response.use(
   async (response) => {
     //remove this for production
     await sleep();
@@ -47,7 +46,7 @@ apiClient.interceptors.response.use(
         toast.error(data.title);
         break;
       case 401:
-        toast.error(data.title);
+        toast.error(data.title || 'Unauthorized');
         break;
       case 404:
         router.navigate('/not-found');
@@ -64,12 +63,10 @@ const responseBody = (response: AxiosResponse) => response.data;
 
 const request = {
   get: (url: string, params?: URLSearchParams) =>
-    apiClient.get(url, { params }).then(responseBody),
-  put: (url: string, body: object) =>
-    apiClient.put(url, body).then(responseBody),
-  post: (url: string, body: object) =>
-    apiClient.post(url, body).then(responseBody),
-  delete: (url: string) => apiClient.delete(url).then(responseBody),
+    axios.get(url, { params }).then(responseBody),
+  put: (url: string, body: object) => axios.put(url, body).then(responseBody),
+  post: (url: string, body: object) => axios.post(url, body).then(responseBody),
+  delete: (url: string) => axios.delete(url).then(responseBody),
 };
 
 //For product
@@ -88,6 +85,13 @@ const TestErrors = {
   get500Error: () => request.get('buggy/server-error'),
 };
 
+//For Account
+const Account = {
+  login: (values: any) => request.post('account/login', values),
+  register: (values: any) => request.post('account/register', values),
+  fetchCurrentUser: () => request.get('account/currentUser'),
+};
+
 //For basket
 const Basket = {
   getBasket: () => request.get('basket'),
@@ -101,5 +105,6 @@ const agent = {
   Catalog,
   TestErrors,
   Basket,
+  Account,
 };
 export default agent;
