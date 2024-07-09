@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/configureStore';
 import { signOut } from '../../features/account/accountSlice';
 import { clearBasket } from '../../features/basket/basketSlice';
+import { Link } from 'react-router-dom';
 
 export default function SignInMenu() {
   const dispatch = useAppDispatch();
@@ -39,7 +40,12 @@ export default function SignInMenu() {
         }}
       >
         <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My orders</MenuItem>
+        <MenuItem
+          component={Link}
+          to='/orders'
+        >
+          My orders
+        </MenuItem>
         <MenuItem
           onClick={() => {
             dispatch(signOut());
