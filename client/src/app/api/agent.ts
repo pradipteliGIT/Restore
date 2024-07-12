@@ -109,11 +109,16 @@ const Order = {
   create: (values: any) => request.post('orders', values),
 };
 
+const Payment = {
+  create: () => request.post('payments', {}),
+};
+
 const agent = {
   Catalog,
   TestErrors,
   Basket,
   Account,
   Order,
+  Payment,
 };
 export default agent;

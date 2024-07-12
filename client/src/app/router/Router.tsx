@@ -11,9 +11,9 @@ import BasketPage from '../../features/basket/BasketPage';
 import Login from '../../features/account/Login';
 import Register from '../../features/account/Register';
 import RequireAuth from './RequireAuth';
-import CheckoutPage from '../../features/checkout/CheckoutPage';
 import Orders from '../../features/orders/Orders';
 import OrderDetails from '../../features/orders/OrderDetails';
+import CheckoutWrapper from '../../features/checkout/CheckoutWrapper';
 
 export const router = createBrowserRouter([
   {
@@ -25,7 +25,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: 'checkout',
-            element: <CheckoutPage />,
+            element: <CheckoutWrapper />,
           },
           {
             path: 'orders',
